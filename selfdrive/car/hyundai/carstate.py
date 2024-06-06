@@ -8,7 +8,7 @@ from opendbc.can.parser import CANParser
 from opendbc.can.can_define import CANDefine
 from openpilot.selfdrive.car.hyundai.hyundaicanfd import CanBus
 from openpilot.selfdrive.car.hyundai.values import HyundaiFlags, CAR, DBC, CAN_GEARS, CAMERA_SCC_CAR, \
-                                                   CANFD_CAR, Buttons, CarControllerParams
+  CANFD_CAR, Buttons, CarControllerParams, UNSUPPORTED_LONGITUDINAL_CAR
 from openpilot.selfdrive.car.interfaces import CarStateBase
 
 PREV_BUTTON_SAMPLES = 8
@@ -100,18 +100,26 @@ class CarState(CarStateBase):
     ret.steerFaultTemporary = cp.vl["MDPS12"]["CF_Mdps_ToiUnavail"] != 0 or cp.vl["MDPS12"]["CF_Mdps_ToiFlt"] != 0
 
     # cruise state
-    if self.CP.openpilotLongitudinalControl:
-      # These are not used for engage/disengage since openpilot keeps track of state using the buttons
-      ret.cruiseState.available = cp.vl["TCS13"]["ACCEnable"] == 0
-      ret.cruiseState.enabled = cp.vl["TCS13"]["ACC_REQ"] == 1
-      ret.cruiseState.standstill = False
-      ret.cruiseState.nonAdaptive = False
+    if not self.CP.flags & HyundaiFlags.UNSUPPORTED_LONGITUDINAL:
+      if self.CP.openpilotLongitudinalControl:
+        # These are not used for engage/disengage since openpilot keeps track of state using the buttons
+        ret.cruiseState.available = cp.vl["TCS13"]["ACCEnable"] == 0
+        ret.cruiseState.enabled = cp.vl["TCS13"]["ACC_REQ"] == 1
+        ret.cruiseState.standstill = False
+        ret.cruiseState.nonAdaptive = False
+      else:
+        ret.cruiseState.available = cp_cruise.vl["SCC11"]["MainMode_ACC"] == 1
+        ret.cruiseState.enabled = cp_cruise.vl["SCC12"]["ACCMode"] != 0
+        ret.cruiseState.standstill = cp_cruise.vl["SCC11"]["SCCInfoDisplay"] == 4.
+        ret.cruiseState.nonAdaptive = cp_cruise.vl["SCC11"]["SCCInfoDisplay"] == 2.  # Shows 'Cruise Control' on dash
+        ret.cruiseState.speed = cp_cruise.vl["SCC11"]["VSetDis"] * speed_conv
     else:
-      ret.cruiseState.available = cp_cruise.vl["SCC11"]["MainMode_ACC"] == 1
-      ret.cruiseState.enabled = cp_cruise.vl["SCC12"]["ACCMode"] != 0
-      ret.cruiseState.standstill = cp_cruise.vl["SCC11"]["SCCInfoDisplay"] == 4.
-      ret.cruiseState.nonAdaptive = cp_cruise.vl["SCC11"]["SCCInfoDisplay"] == 2.  # Shows 'Cruise Control' on dash
-      ret.cruiseState.speed = cp_cruise.vl["SCC11"]["VSetDis"] * speed_conv
+      # Unsupported longitudinal car.
+      ret.cruiseState.available = False
+      ret.cruiseState.enabled = False
+      ret.cruiseState.standstill = False
+      ret.cruiseState.nonAdaptive = True
+      ret.cruiseState.speed = 0
 
     # TODO: Find brake pressure
     ret.brake = 0
@@ -270,10 +278,13 @@ class CarState(CarStateBase):
     ]
 
     if not CP.openpilotLongitudinalControl and CP.carFingerprint not in CAMERA_SCC_CAR:
-      messages += [
-        ("SCC11", 50),
-        ("SCC12", 50),
-      ]
+
+      if CP.carFingerprint not in UNSUPPORTED_LONGITUDINAL_CAR:
+        messages += [
+          ("SCC11", 50),
+          ("SCC12", 50),
+        ]
+
       if CP.flags & HyundaiFlags.USE_FCA.value:
         messages.append(("FCA11", 50))
 
