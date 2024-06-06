@@ -191,6 +191,10 @@ def get_car_interface(CP):
 
 
 def get_car(logcan, sendcan, experimental_long_allowed, num_pandas=1):
+
+  os.environ['FINGERPRINT'] = "KIA_CEED_SW_PHEV_2022_NON_SCC"
+  #os.environ['SKIP_FW_QUERY']
+
   candidate, fingerprints, vin, car_fw, source, exact_match = fingerprint(logcan, sendcan, num_pandas)
 
   if candidate is None:
