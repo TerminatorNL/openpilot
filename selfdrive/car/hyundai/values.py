@@ -95,6 +95,9 @@ class HyundaiFlags(IntFlag):
 
   MIN_STEER_32_MPH = 2 ** 23
 
+  # No adaptive cruise control is available.
+  NO_SCC = 2 ** 24
+
 
 class Footnote(Enum):
   CANFD = CarFootnote(
@@ -479,7 +482,7 @@ class CAR(Platforms):
   KIA_CEED_SW_PHEV_2022_NON_SCC = HyundaiPlatformConfig(
     [HyundaiCarDocs("Kia Ceed Sportswagon PHEV 2022 (Non-SCC)", car_parts=CarParts.common([CarHarness.hyundai_i]))],
     CarSpecs(mass=1650, wheelbase=2.65, steerRatio=13.75, tireStiffnessFactor=0.5),
-    flags=HyundaiFlags.HYBRID | HyundaiFlags.USE_FCA | HyundaiFlags.UNSUPPORTED_LONGITUDINAL
+    flags=HyundaiFlags.HYBRID | HyundaiFlags.USE_FCA | HyundaiFlags.NO_SCC
   )
   KIA_EV6 = HyundaiCanFDPlatformConfig(
     [
@@ -711,7 +714,7 @@ FW_QUERY_CONFIG = FwQueryConfig(
   non_essential_ecus={
     Ecu.abs: [CAR.HYUNDAI_PALISADE, CAR.HYUNDAI_SONATA, CAR.HYUNDAI_SANTA_FE_2022, CAR.KIA_K5_2021, CAR.HYUNDAI_ELANTRA_2021,
               CAR.HYUNDAI_SANTA_FE, CAR.HYUNDAI_KONA_EV_2022, CAR.HYUNDAI_KONA_EV, CAR.HYUNDAI_CUSTIN_1ST_GEN, CAR.KIA_SORENTO,
-              CAR.KIA_CEED, CAR.KIA_SELTOS],
+              CAR.KIA_CEED, CAR.KIA_CEED_SW_PHEV_2022_NON_SCC, CAR.KIA_SELTOS],
   },
   extra_ecus=[
     (Ecu.adas, 0x730, None),              # ADAS Driving ECU on HDA2 platforms
@@ -744,6 +747,9 @@ CANFD_UNSUPPORTED_LONGITUDINAL_CAR = CAR.with_flags(HyundaiFlags.CANFD_NO_RADAR_
 
 # The camera does SCC on these cars, rather than the radar
 CAMERA_SCC_CAR = CAR.with_flags(HyundaiFlags.CAMERA_SCC)
+
+# This car does not have SCC capabilities. Adaptive cruise is not available.
+NO_SCC_CAR = CAR.with_flags(HyundaiFlags.NO_SCC)
 
 HYBRID_CAR = CAR.with_flags(HyundaiFlags.HYBRID)
 

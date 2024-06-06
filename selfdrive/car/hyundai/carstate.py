@@ -8,7 +8,7 @@ from opendbc.can.parser import CANParser
 from opendbc.can.can_define import CANDefine
 from openpilot.selfdrive.car.hyundai.hyundaicanfd import CanBus
 from openpilot.selfdrive.car.hyundai.values import HyundaiFlags, CAR, DBC, CAN_GEARS, CAMERA_SCC_CAR, \
-  CANFD_CAR, Buttons, CarControllerParams, UNSUPPORTED_LONGITUDINAL_CAR
+  CANFD_CAR, Buttons, CarControllerParams, UNSUPPORTED_LONGITUDINAL_CAR, NO_SCC_CAR
 from openpilot.selfdrive.car.interfaces import CarStateBase
 
 PREV_BUTTON_SAMPLES = 8
@@ -100,7 +100,7 @@ class CarState(CarStateBase):
     ret.steerFaultTemporary = cp.vl["MDPS12"]["CF_Mdps_ToiUnavail"] != 0 or cp.vl["MDPS12"]["CF_Mdps_ToiFlt"] != 0
 
     # cruise state
-    if not self.CP.flags & HyundaiFlags.UNSUPPORTED_LONGITUDINAL:
+    if not self.CP.flags & HyundaiFlags.UNSUPPORTED_LONGITUDINAL and not self.CP.flags & HyundaiFlags.NO_SCC:
       if self.CP.openpilotLongitudinalControl:
         # These are not used for engage/disengage since openpilot keeps track of state using the buttons
         ret.cruiseState.available = cp.vl["TCS13"]["ACCEnable"] == 0
@@ -157,7 +157,7 @@ class CarState(CarStateBase):
       aeb_sig = "FCA_CmdAct" if self.CP.flags & HyundaiFlags.USE_FCA.value else "AEB_CmdAct"
       aeb_warning = cp_cruise.vl[aeb_src]["CF_VSM_Warn"] != 0
 
-      if not self.CP.flags & HyundaiFlags.UNSUPPORTED_LONGITUDINAL:
+      if not self.CP.flags & HyundaiFlags.UNSUPPORTED_LONGITUDINAL and not self.CP.flags & HyundaiFlags.NO_SCC:
         scc_warning = cp_cruise.vl["SCC12"]["TakeOverReq"] == 1  # sometimes only SCC system shows an FCW
       else:
         scc_warning = False
@@ -284,7 +284,7 @@ class CarState(CarStateBase):
 
     if not CP.openpilotLongitudinalControl and CP.carFingerprint not in CAMERA_SCC_CAR:
 
-      if CP.carFingerprint not in UNSUPPORTED_LONGITUDINAL_CAR:
+      if CP.carFingerprint not in UNSUPPORTED_LONGITUDINAL_CAR and CP.carFingerprint not in NO_SCC_CAR:
         messages += [
           ("SCC11", 50),
           ("SCC12", 50),
