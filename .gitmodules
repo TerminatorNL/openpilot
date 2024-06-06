@@ -1,6 +1,7 @@
 [submodule "panda"]
   path = panda
   url = https://github.com/TerminatorNL/panda.git
+  branch = hyundai-no-scc
 [submodule "opendbc"]
   path = opendbc
   url = ../../commaai/opendbc.git
