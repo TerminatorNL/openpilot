@@ -154,7 +154,8 @@ class CarState(CarStateBase):
     if not self.CP.openpilotLongitudinalControl:
       aeb_src = "FCA11" if self.CP.flags & HyundaiFlags.USE_FCA.value else "SCC12"
       aeb_sig = "FCA_CmdAct" if self.CP.flags & HyundaiFlags.USE_FCA.value else "AEB_CmdAct"
-      aeb_warning = cp_cruise.vl[aeb_src]["CF_VSM_Warn"] != 0
+      aeb_bus = cp_cam if self.CP.flags & HyundaiFlags.USE_FCA.value else cp_cruise
+      aeb_warning = aeb_bus.vl[aeb_src]["CF_VSM_Warn"] != 0
 
       if not self.CP.flags & HyundaiFlags.UNSUPPORTED_LONGITUDINAL and not self.CP.flags & HyundaiFlags.NO_SCC:
         scc_warning = cp_cruise.vl["SCC12"]["TakeOverReq"] == 1  # sometimes only SCC system shows an FCW
@@ -288,9 +289,6 @@ class CarState(CarStateBase):
           ("SCC11", 50),
           ("SCC12", 50),
         ]
-
-    if CP.flags & HyundaiFlags.USE_FCA.value:
-      messages.append(("FCA11", 50))
 
     if CP.enableBsm:
       messages.append(("LCA11", 50))
