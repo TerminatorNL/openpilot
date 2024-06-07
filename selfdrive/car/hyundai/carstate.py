@@ -116,7 +116,7 @@ class CarState(CarStateBase):
     else:
       # Unsupported longitudinal car.
       ret.cruiseState.available = cp.vl["TCS13"]["ACCEnable"] == 0
-      ret.cruiseState.enabled = cp.vl["E_EMS12"]['Cruise_Limit_Status'] != 0
+      ret.cruiseState.enabled = cp.vl["E_EMS11"]['Cruise_Limit_Status'] != 0
       ret.cruiseState.standstill = False
       ret.cruiseState.nonAdaptive = False
 
