@@ -162,7 +162,7 @@ class CarState(CarStateBase):
       else:
         scc_warning = False
 
-      aeb_braking = aeb_bus.vl[aeb_src]["CF_VSM_DecCmdAct"] != 0 or cp_cruise.vl[aeb_src][aeb_sig] != 0
+      aeb_braking = aeb_bus.vl[aeb_src]["CF_VSM_DecCmdAct"] != 0 or aeb_bus.vl[aeb_src][aeb_sig] != 0
       ret.stockFcw = (aeb_warning or scc_warning) and not aeb_braking
       ret.stockAeb = aeb_warning and aeb_braking
 
