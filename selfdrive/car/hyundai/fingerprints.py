@@ -567,7 +567,8 @@ FW_VERSIONS = {
       b'\xf1\x00CD  MDPS C 1.00 1.01 56310-XX000 4CPHC101',
     ],
     (Ecu.transmission, 0x7e1, None): [
-      b'\xf1\x006U3L0_C2\x00\x006U3K7051\x00\x00PCD0G16UL0\xc4VZ\xce'
+      b'\xf1\x006U3L0_C2\x00\x006U3K7051\x00\x00PCD0G16UL0\xc4VZ\xce',
+      b'\xf1\x006U3L0_C2\x00\x006U3K7051\x00\x00PCD0G16UL0\x00\x00\x00\x00'
     ],
     (Ecu.fwdCamera, 0x7c4, None): [
       b'\xf1\x00CDH LKAS AT EUR LHD 1.00 1.01 99211-CR700 931'
