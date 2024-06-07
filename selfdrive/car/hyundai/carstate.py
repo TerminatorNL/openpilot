@@ -115,11 +115,11 @@ class CarState(CarStateBase):
         ret.cruiseState.speed = cp_cruise.vl["SCC11"]["VSetDis"] * speed_conv
     else:
       # Unsupported longitudinal car.
-      ret.cruiseState.available = False
-      ret.cruiseState.enabled = False
+      ret.cruiseState.available = cp.vl["TCS13"]["ACCEnable"] == 0
+      ret.cruiseState.enabled = cp.vl["E_EMS12"]['Cruise_Limit_Status'] != 0
       ret.cruiseState.standstill = False
-      ret.cruiseState.nonAdaptive = True
-      ret.cruiseState.speed = 0
+      ret.cruiseState.nonAdaptive = False
+      ret.cruiseState.speed = cp.vl["LVR12"]["CF_Lvr_CruiseSet"] * speed_conv
 
     # TODO: Find brake pressure
     ret.brake = 0
