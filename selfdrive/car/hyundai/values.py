@@ -482,7 +482,7 @@ class CAR(Platforms):
   KIA_CEED_SW_PHEV_2022_NON_SCC = HyundaiPlatformConfig(
     [HyundaiCarDocs("Kia Ceed Sportswagon PHEV 2022 (Non-SCC)", car_parts=CarParts.common([CarHarness.hyundai_i]))],
     CarSpecs(mass=1650, wheelbase=2.65, steerRatio=13.75, tireStiffnessFactor=0.5),
-    flags=HyundaiFlags.HYBRID | HyundaiFlags.NO_SCC
+    flags=HyundaiFlags.HYBRID | HyundaiFlags.USE_FCA | HyundaiFlags.NO_SCC
   )
   KIA_EV6 = HyundaiCanFDPlatformConfig(
     [
