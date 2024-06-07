@@ -289,9 +289,6 @@ class CarState(CarStateBase):
           ("SCC12", 50),
         ]
 
-    if CP.flags & HyundaiFlags.USE_FCA.value:
-      messages.append(("FCA11", 50))
-
     if CP.enableBsm:
       messages.append(("LCA11", 50))
 
